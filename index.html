@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>禹吉</title>
+<style>
+  /* ===== Reset & Base ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    background: #0a0a0f;
+    color: #e8e0d0;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ===== Scroll-driven opacity for 吉王 (CSS only via scroll-timeline where supported) ===== */
+  /* Fallback handled by JS */
+
+  /* ===== Hero Section ===== */
+  .hero {
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, #1a1025 0%, #0a0a0f 70%);
+    z-index: 0;
+  }
+
+  .hero-particles {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.4;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+
+  .jiwang {
+    font-size: clamp(5rem, 15vw, 12rem);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    background: linear-gradient(180deg, #f0d78c 0%, #c8963e 50%, #8b5e2f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 60px rgba(200, 150, 60, 0.4));
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    user-select: none;
+    animation: breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { filter: drop-shadow(0 0 60px rgba(200, 150, 60, 0.4)); }
+    50%      { filter: drop-shadow(0 0 80px rgba(240, 200, 80, 0.6)); }
+  }
+
+  .hero-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    color: rgba(200, 180, 140, 0.7);
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    animation: float 2s ease-in-out infinite;
+    cursor: default;
+  }
+
+  .hero-hint span {
+    display: block;
+    text-align: center;
+    font-size: 1.4rem;
+    margin-top: 6px;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* ===== Section Common ===== */
+  section {
+    padding: 80px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    margin-bottom: 50px;
+    color: #d4b87a;
+    letter-spacing: 0.08em;
+  }
+
+  /* ===== Gallery ===== */
+  .gallery {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+
+  .gallery-item {
+    width: 100%;
+    max-width: 650px;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .gallery-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 2px rgba(200, 160, 80, 0.2);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .gallery-item img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6), 0 0 20px rgba(200, 160, 80, 0.3);
+  }
+
+  /* ===== My Site Text ===== */
+  .site-declaration {
+    text-align: center;
+    padding: 60px 20px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .site-declaration.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .site-declaration p {
+    font-size: clamp(1.4rem, 3.5vw, 2rem);
+    font-weight: 600;
+    color: #d4b87a;
+    letter-spacing: 0.1em;
+  }
+
+  /* ===== Feedback Section ===== */
+  .feedback {
+    padding: 60px 20px 80px;
+  }
+
+  .feedback-form {
+    max-width: 560px;
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .feedback-form.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .form-group {
+    margin-bottom: 22px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    color: #c8b48a;
+    letter-spacing: 0.05em;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(200, 160, 80, 0.25);
+    border-radius: 12px;
+    color: #e8e0d0;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    outline: none;
+    resize: vertical;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: rgba(200, 160, 80, 0.6);
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 0 4px rgba(200, 160, 80, 0.08);
+  }
+
+  .form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c8b48a' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    padding-right: 44px;
+    cursor: pointer;
+  }
+
+  .form-group select option {
+    background: #1a1025;
+    color: #e8e0d0;
+  }
+
+  .submit-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #c8963e 0%, #8b5e2f 100%);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.3s ease, opacity 0.2s ease;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(200, 150, 60, 0.35);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .form-success {
+    display: none;
+    text-align: center;
+    padding: 30px;
+    color: #7ec87e;
+    font-size: 1.1rem;
+  }
+
+  /* ===== Footer ===== */
+  .site-footer {
+    text-align: center;
+    padding: 30px 20px;
+    border-top: 1px solid rgba(200, 160, 80, 0.1);
+    color: rgba(200, 180, 140, 0.5);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+
+  .site-footer .site-name {
+    color: #d4b87a;
+    font-weight: 600;
+    margin: 0 6px;
+  }
+
+  /* ===== Toast ===== */
+  .toast {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-120px);
+    background: #2a4020;
+    border: 1px solid #7ec87e;
+    color: #c8e8c0;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    z-index: 999;
+    transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+    letter-spacing: 0.05em;
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 768px) {
+    section { padding: 50px 16px; }
+    .gallery { gap: 30px; padding-top: 40px; padding-bottom: 40px; }
+    .gallery-item img { border-radius: 10px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea { padding: 12px 14px; font-size: 0.95rem; }
+    .hero-hint { bottom: 28px; font-size: 0.8rem; }
+  }
+
+  @media (max-width: 480px) {
+    section { padding: 40px 12px; }
+    .gallery { gap: 24px; }
+    .gallery-item img { border-radius: 8px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea { padding: 10px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Toast ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== Hero ===== -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <h1 class="jiwang" id="jiwang">吉王</h1>
+  </div>
+  <div class="hero-hint" id="heroHint">
+    向下滚动
+    <span>↓</span>
+  </div>
+</section>
+
+<!-- ===== Gallery ===== -->
+<section class="gallery" id="gallery">
+  <div class="gallery-item" data-reveal>
+    <img src="图一.png" alt="图一">
+  </div>
+  <div class="gallery-item" data-reveal>
+    <img src="图二.png" alt="图二">
+  </div>
+</section>
+
+<!-- ===== My Site ===== -->
+<section class="site-declaration" data-reveal>
+  <p>这是我的网站</p>
+</section>
+
+<!-- ===== Feedback ===== -->
+<section class="feedback">
+  <h2 class="section-title">意见反馈</h2>
+  <div class="feedback-form" data-reveal id="feedbackForm">
+    <div class="form-group">
+      <label for="type">反馈类型</label>
+      <select id="type" name="type">
+        <option value="需求">需求</option>
+        <option value="建议">建议</option>
+        <option value="意见">意见</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="contact">联系方式（选填）</label>
+      <input type="text" id="contact" name="contact" placeholder="邮箱 / 微信 / 手机号" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label for="content">反馈内容</label>
+      <textarea id="content" name="content" rows="5" placeholder="请写下您想告诉我们的内容…"></textarea>
+    </div>
+    <button class="submit-btn" id="submitBtn" type="submit">提交反馈</button>
+  </div>
+  <div class="form-success" id="formSuccess">
+    ✓ 感谢您的反馈，我们会认真对待每一条意见！
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="site-footer">
+  由<span class="site-name">吉吉国王</span>开发 · <span class="site-name">禹吉</span>
+</footer>
+
+<script>
+(function() {
+  /* ===== 吉王 scroll fade ===== */
+  const jiwang = document.getElementById('jiwang');
+  const heroHint = document.getElementById('heroHint');
+  let ticking = false;
+
+  function updateJiwang() {
+    const heroH = window.innerHeight;
+    const scrollY = window.scrollY;
+    const progress = Math.min(scrollY / (heroH * 0.7), 1);
+    const opacity = 1 - progress;
+    const scale = 1 + progress * 0.15;
+    jiwang.style.opacity = Math.max(opacity, 0);
+    jiwang.style.transform = `scale(${scale})`;
+    heroHint.style.opacity = Math.max(1 - progress * 2.5, 0);
+  }
+
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        updateJiwang();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  /* ===== Reveal on scroll ===== */
+  const revealEls = document.querySelectorAll('[data-reveal]');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+  revealEls.forEach(function(el) { observer.observe(el); });
+
+  /* ===== Feedback form ===== */
+  var submitBtn = document.getElementById('submitBtn');
+  var form = document.getElementById('feedbackForm');
+  var success = document.getElementById('formSuccess');
+  var toast = document.getElementById('toast');
+  var toastTimer;
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 2500);
+  }
+
+  submitBtn.addEventListener('click', function() {
+    var type = document.getElementById('type').value;
+    var contact = document.getElementById('contact').value.trim();
+    var content = document.getElementById('content').value.trim();
+
+    if (!content) {
+      showToast('请填写反馈内容');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '提交中…';
+
+    // Collect feedback (log to console; in production you'd POST to a server)
+    var feedback = {
+      type: type,
+      contact: contact,
+      content: content,
+      time: new Date().toISOString()
+    };
+
+    // Simulate submission
+    setTimeout(function() {
+      console.log('反馈已提交:', feedback);
+      form.style.display = 'none';
+      success.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = '提交反馈';
+    }, 600);
+  });
+
+  // Initial state
+  updateJiwang();
+})();
+</script>
+</body>
+</html>
