@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理面板 - 禹吉</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #0a0a0f;
+    color: #e8e0d0;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  /* Password Gate */
+  .gate {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; min-height: 100dvh;
+  }
+  .gate-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(200,160,80,0.25);
+    border-radius: 20px;
+    padding: 50px 40px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+  }
+  .gate-card h1 { font-size: 1.8rem; color: #d4b87a; margin-bottom: 8px; }
+  .gate-card .subtitle { color: #887766; font-size: 0.9rem; margin-bottom: 28px; }
+  .gate-card input {
+    width: 100%; padding: 14px 18px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(200,160,80,0.3);
+    border-radius: 10px; color: #e8e0d0;
+    font-size: 1rem; text-align: center; letter-spacing: 0.3em;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .gate-card input:focus { border-color: rgba(200,160,80,0.7); }
+  .gate-card .btn {
+    width: 100%; padding: 14px; margin-top: 16px;
+    background: linear-gradient(135deg, #c8963e, #8b5e2f);
+    border: none; border-radius: 10px;
+    color: #fff; font-size: 1rem; font-weight: 600;
+    cursor: pointer; letter-spacing: 0.1em;
+    transition: transform 0.2s;
+  }
+  .gate-card .btn:hover { transform: translateY(-2px); }
+  .gate-error { color: #e07070; font-size: 0.85rem; margin-top: 10px; display: none; }
+
+  /* Dashboard */
+  .dashboard { display: none; max-width: 800px; margin: 0 auto; padding: 30px 0; }
+  .dash-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 40px; flex-wrap: wrap; gap: 16px;
+  }
+  .dash-header h1 { color: #d4b87a; font-size: 1.6rem; letter-spacing: 0.05em; }
+  .dash-header .logout {
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(200,160,80,0.2);
+    border-radius: 8px;
+    color: #a09080; cursor: pointer;
+    font-size: 0.9rem; transition: background 0.3s;
+  }
+  .dash-header .logout:hover { background: rgba(255,255,255,0.1); }
+
+  .stats { display: flex; gap: 16px; margin-bottom: 35px; flex-wrap: wrap; }
+  .stat-card {
+    flex: 1; min-width: 120px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(200,160,80,0.15);
+    border-radius: 14px; padding: 22px 18px; text-align: center;
+  }
+  .stat-card .num { font-size: 2rem; font-weight: 700; color: #d4b87a; }
+  .stat-card .label { font-size: 0.8rem; color: #887766; margin-top: 4px; }
+
+  .feedback-list { display: flex; flex-direction: column; gap: 16px; }
+  .feedback-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(200,160,80,0.12);
+    border-radius: 14px; padding: 20px 22px;
+  }
+  .feedback-item .meta {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    font-size: 0.8rem; color: #887766; margin-bottom: 10px;
+  }
+  .feedback-item .meta .tag {
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    background: rgba(200,160,80,0.12);
+    color: #c8a860;
+  }
+  .feedback-item .body { line-height: 1.7; color: #c8c0b0; word-break: break-word; }
+
+  .empty { text-align: center; padding: 60px 20px; color: #665544; }
+  .info-box {
+    background: rgba(200,160,80,0.06);
+    border: 1px solid rgba(200,160,80,0.2);
+    border-radius: 14px; padding: 22px; margin-bottom: 30px;
+    line-height: 1.8;
+  }
+  .info-box strong { color: #d4b87a; }
+  .info-box a { color: #c8963e; }
+
+  @media (max-width: 480px) {
+    .gate-card { padding: 30px 20px; }
+    .stats { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Password Gate -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <h1>管理面板</h1>
+    <p class="subtitle">禹吉 · 网站管理</p>
+    <input type="password" id="pwdInput" placeholder="请输入管理密码" autocomplete="off">
+    <button class="btn" id="loginBtn">进 入</button>
+    <p class="gate-error" id="gateError">密码错误</p>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div class="dashboard" id="dashboard">
+  <div class="dash-header">
+    <h1>反馈管理</h1>
+    <button class="logout" id="logoutBtn">退出</button>
+  </div>
+
+  <div class="info-box">
+    <strong>📬 邮件接收：</strong>所有反馈实时发送至 <strong>claytonsun525@gmail.com</strong>，请查看 Gmail 收件箱。<br>
+    <strong>💡 提示：</strong>首次使用 formsubmit.co 会发送确认邮件，点击确认后即可正常接收反馈。
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="num" id="totalCount">0</div>
+      <div class="label">总反馈数</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="demandCount">0</div>
+      <div class="label">需求</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="suggestCount">0</div>
+      <div class="label">建议</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="opinionCount">0</div>
+      <div class="label">意见</div>
+    </div>
+  </div>
+
+  <div class="feedback-list" id="feedbackList">
+    <div class="empty">暂无反馈记录</div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var PASSWORD = 'jiwang2025';
+
+  var gate = document.getElementById('gate');
+  var dashboard = document.getElementById('dashboard');
+  var pwdInput = document.getElementById('pwdInput');
+  var loginBtn = document.getElementById('loginBtn');
+  var gateError = document.getElementById('gateError');
+  var logoutBtn = document.getElementById('logoutBtn');
+  var feedbackList = document.getElementById('feedbackList');
+
+  // Check if already logged in
+  if (sessionStorage.getItem('yuji_admin') === '1') {
+    showDashboard();
+  }
+
+  loginBtn.addEventListener('click', function() {
+    if (pwdInput.value === PASSWORD) {
+      sessionStorage.setItem('yuji_admin', '1');
+      showDashboard();
+    } else {
+      gateError.style.display = 'block';
+    }
+  });
+
+  pwdInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') loginBtn.click();
+  });
+
+  logoutBtn.addEventListener('click', function() {
+    sessionStorage.removeItem('yuji_admin');
+    gate.style.display = 'flex';
+    dashboard.style.display = 'none';
+    pwdInput.value = '';
+  });
+
+  function showDashboard() {
+    gate.style.display = 'none';
+    dashboard.style.display = 'block';
+    renderFeedback();
+  }
+
+  function renderFeedback() {
+    var raw = localStorage.getItem('yuji_feedback_backup');
+    var feedbacks = raw ? JSON.parse(raw) : [];
+    updateStats(feedbacks);
+
+    if (feedbacks.length === 0) {
+      feedbackList.innerHTML = '<div class="empty">暂无反馈记录<br><small style="color:#887766">（此处仅显示本设备备份，所有反馈已发送至邮箱）</small></div>';
+      return;
+    }
+
+    var html = '';
+    feedbacks.slice().reverse().forEach(function(f) {
+      html += '<div class="feedback-item">';
+      html += '<div class="meta">';
+      html += '<span class="tag">' + esc(f.type || '未分类') + '</span>';
+      html += '<span>' + esc(f.time || '') + '</span>';
+      if (f.contact) html += '<span>📧 ' + esc(f.contact) + '</span>';
+      html += '</div>';
+      html += '<div class="body">' + esc(f.content) + '</div>';
+      html += '</div>';
+    });
+    feedbackList.innerHTML = html;
+  }
+
+  function updateStats(list) {
+    document.getElementById('totalCount').textContent = list.length;
+    document.getElementById('demandCount').textContent = list.filter(function(f) { return f.type === '需求'; }).length;
+    document.getElementById('suggestCount').textContent = list.filter(function(f) { return f.type === '建议'; }).length;
+    document.getElementById('opinionCount').textContent = list.filter(function(f) { return f.type === '意见'; }).length;
+  }
+
+  function esc(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+})();
+</script>
+</body>
+</html>

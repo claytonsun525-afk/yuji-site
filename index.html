@@ -373,10 +373,18 @@
 <!-- ===== Feedback ===== -->
 <section class="feedback">
   <h2 class="section-title">意见反馈</h2>
-  <div class="feedback-form" data-reveal id="feedbackForm">
+  <form class="feedback-form" data-reveal id="feedbackForm"
+        action="https://formsubmit.co/claytonsun525@gmail.com" method="POST">
+
+    <!-- formsubmit.co 配置 -->
+    <input type="hidden" name="_subject" value="禹吉网站 - 新反馈">
+    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_next" value="https://claytonsun525-afk.github.io/yuji-site/thanks.html">
+
     <div class="form-group">
       <label for="type">反馈类型</label>
-      <select id="type" name="type">
+      <select id="type" name="类型">
         <option value="需求">需求</option>
         <option value="建议">建议</option>
         <option value="意见">意见</option>
@@ -384,14 +392,14 @@
     </div>
     <div class="form-group">
       <label for="contact">联系方式（选填）</label>
-      <input type="text" id="contact" name="contact" placeholder="邮箱 / 微信 / 手机号" autocomplete="off">
+      <input type="text" id="contact" name="联系方式" placeholder="邮箱 / 微信 / 手机号" autocomplete="off">
     </div>
     <div class="form-group">
-      <label for="content">反馈内容</label>
-      <textarea id="content" name="content" rows="5" placeholder="请写下您想告诉我们的内容…"></textarea>
+      <label for="content">反馈内容 <span style="color:#e07070">*</span></label>
+      <textarea id="content" name="反馈内容" rows="5" placeholder="请写下您想告诉我们的内容…" required></textarea>
     </div>
     <button class="submit-btn" id="submitBtn" type="submit">提交反馈</button>
-  </div>
+  </form>
   <div class="form-success" id="formSuccess">
     ✓ 感谢您的反馈，我们会认真对待每一条意见！
   </div>
@@ -445,8 +453,7 @@
 
   /* ===== Feedback form ===== */
   var submitBtn = document.getElementById('submitBtn');
-  var form = document.getElementById('feedbackForm');
-  var success = document.getElementById('formSuccess');
+  var formEl = document.getElementById('feedbackForm');
   var toast = document.getElementById('toast');
   var toastTimer;
 
@@ -457,35 +464,34 @@
     toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 2500);
   }
 
-  submitBtn.addEventListener('click', function() {
+  // Intercept form submit: save backup to localStorage for admin page, then submit
+  formEl.addEventListener('submit', function(e) {
     var type = document.getElementById('type').value;
     var contact = document.getElementById('contact').value.trim();
     var content = document.getElementById('content').value.trim();
 
     if (!content) {
+      e.preventDefault();
       showToast('请填写反馈内容');
       return;
     }
 
+    // Save backup to localStorage (for admin.html to read on this device)
+    try {
+      var backup = localStorage.getItem('yuji_feedback_backup');
+      var list = backup ? JSON.parse(backup) : [];
+      list.push({
+        type: type,
+        contact: contact,
+        content: content,
+        time: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })
+      });
+      localStorage.setItem('yuji_feedback_backup', JSON.stringify(list));
+    } catch (_) {}
+
     submitBtn.disabled = true;
     submitBtn.textContent = '提交中…';
-
-    // Collect feedback (log to console; in production you'd POST to a server)
-    var feedback = {
-      type: type,
-      contact: contact,
-      content: content,
-      time: new Date().toISOString()
-    };
-
-    // Simulate submission
-    setTimeout(function() {
-      console.log('反馈已提交:', feedback);
-      form.style.display = 'none';
-      success.style.display = 'block';
-      submitBtn.disabled = false;
-      submitBtn.textContent = '提交反馈';
-    }, 600);
+    // Form submits naturally to formsubmit.co → user is redirected to thanks.html
   });
 
   // Initial state
